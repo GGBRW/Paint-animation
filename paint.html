@@ -1,0 +1,44 @@
+<canvas id="c"></canvas>
+<script>
+    const ctx = c.getContext("2d");
+    [c.height,c.width] = [innerHeight,innerWidth];
+    document.body.style.margin = document.body.style.overflow = 0;
+
+    let lines = [];
+    let color = { r: Math.random() * 2, g: Math.random() * 2, b: Math.random() * 2 }
+
+    c.onmousedown = function() { lines.push([]); }
+    c.onmousemove = function(e) {
+        if(e.which == 1) {
+            lines[lines.length - 1].push({x: e.x, y: e.y, age: 0});
+        }
+    }
+
+    function run() {
+        ctx.clearRect(0,0,c.width,c.height);
+        for(let line of lines) {
+            for(let i = 1; i < line.length; ++i) {
+                if(line[line.length - 1] && line[line.length - 1].age > 256) continue;
+                ctx.beginPath();
+                ctx.moveTo(line[i - 1].x,line[i - 1].y);
+                ctx.lineTo(line[i].x,line[i].y);
+                ctx.strokeStyle = `rgba(${0 | line[i].age * color.r},${0 | line[i].age * color.g},${0 | line[i].age * color.b}, ${(255 - line[i].age) / 255})`;
+                ctx.lineWidth = line[i].age / 4 + 8;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(line[i].x,line[i].y,line[i].age / 8 + 4,0,Math.PI * 2);
+                ctx.fillStyle = `rgba(${0 | line[i].age * color.r},${0 | line[i].age * color.g},${0 | line[i].age * color.b}, ${(255 - line[i].age) / 255})`;
+                ctx.fill();
+
+                line[i].x += Math.random() * (line[i].age / 10) - (line[i].age / 20);
+                line[i].y += Math.random() * (line[i].age / 10) - (line[i].age / 20);
+                ++line[i].age;
+            }
+        }
+
+        color = { r: Math.random() * 2, g: Math.random() * 2, b: Math.random() * 2 }
+        requestAnimationFrame(run);
+    };
+    run();
+</script>
